@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, Play, CheckCircle, XCircle, MessageSquare } from "lucide-react";
+import { ArrowLeft, Play, CheckCircle, XCircle, MessageSquare, Calendar, Clock } from "lucide-react";
 import { demoMeetings, Task } from "@/data/meetings";
 import { useToast } from "@/hooks/use-toast";
 
@@ -137,43 +137,83 @@ ${meeting!.blockers}
   const progress = meetingStarted ? ((currentTaskIndex + (currentAnswer !== null ? 0.5 : 0)) / meeting.tasks.length) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
+    <div className="min-h-screen bg-gradient-subtle relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-primary/5 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-accent/10 rounded-full blur-3xl"></div>
+      </div>
+      
       {/* Header */}
-      <div className="bg-card border-b shadow-soft">
-        <div className="container mx-auto px-6 py-6">
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="secondary" 
-              size="sm"
-              onClick={() => navigate('/')}
-              className="hover:bg-secondary-hover"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Meetings
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold text-card-foreground">
-                {meeting.title}
-              </h1>
-              <p className="text-muted-foreground">
-                {new Date(meeting.date).toLocaleDateString()} at {meeting.time}
-              </p>
+      <div className="relative bg-card/90 backdrop-blur-md border-b border-border/50 shadow-strong">
+        <div className="container mx-auto px-6 py-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-6">
+              <Button 
+                variant="secondary" 
+                size="sm"
+                onClick={() => navigate('/')}
+                className="hover:bg-secondary-hover hover:scale-105 transition-all duration-200 px-4 py-2"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Meetings
+              </Button>
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
+                    Meeting #{meeting.id}
+                  </div>
+                  {meetingStarted && (
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-accent/10 text-accent-foreground rounded-full text-xs font-medium">
+                      <div className="w-2 h-2 bg-accent rounded-full animate-pulse"></div>
+                      In Progress
+                    </div>
+                  )}
+                </div>
+                <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                  {meeting.title}
+                </h1>
+                <p className="text-muted-foreground mt-1 flex items-center gap-4">
+                  <span className="flex items-center gap-1">
+                    <Calendar className="h-4 w-4" />
+                    {new Date(meeting.date).toLocaleDateString()}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="h-4 w-4" />
+                    {meeting.time}
+                  </span>
+                </p>
+              </div>
             </div>
           </div>
           
           {meetingStarted && (
-            <div className="mt-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-muted-foreground">Progress</span>
-                <span className="text-sm font-medium">{Math.round(progress)}%</span>
+            <div className="mt-8 bg-card/50 rounded-xl p-6 backdrop-blur-sm border border-border/30">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
+                    <MessageSquare className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-card-foreground">Meeting Progress</p>
+                    <p className="text-sm text-muted-foreground">Task review in progress</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-primary">{Math.round(progress)}%</p>
+                  <p className="text-xs text-muted-foreground">Complete</p>
+                </div>
               </div>
-              <Progress value={progress} className="h-2" />
+              <Progress value={progress} className="h-3 bg-secondary/50" />
+              <p className="text-xs text-muted-foreground mt-2">
+                {currentTaskIndex + 1} of {meeting.tasks.length} tasks reviewed
+              </p>
             </div>
           )}
         </div>
       </div>
 
-      <div className="container mx-auto px-6 py-8">
+      <div className="relative container mx-auto px-6 py-12">
         {!meetingStarted ? (
           /* Meeting Overview */
           <div className="max-w-4xl mx-auto space-y-6">
